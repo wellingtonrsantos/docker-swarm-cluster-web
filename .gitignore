@@ -6,7 +6,6 @@
 *.iws
 out/
 
-*.log
 *.swp
 *.swo
 *.tmp
