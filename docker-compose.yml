@@ -1,0 +1,38 @@
+services:
+  web:
+    image: nginx:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: any
+      endpoint_mode: dnsrr
+    volumes:
+      - ./public:/usr/share/nginx/html
+    networks:
+      - cluster-network
+
+  load-balancer:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./logs:/var/log/nginx
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+    networks:
+      - cluster-network
+    depends_on:
+      - web
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+
+configs:
+  nginx_config:
+    file: ./nginx/nginx.conf
+
+networks:
+  cluster-network:
+    driver: overlay
